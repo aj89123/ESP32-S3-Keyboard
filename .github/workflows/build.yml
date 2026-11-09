@@ -1,0 +1,37 @@
+
+name: Build ESP32-S3 Keyboard
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install PlatformIO
+        run: pip install platformio
+
+      - name: Build ESP32-S3 firmware
+        run: pio run
+
+      - name: Create merged firmware
+        run: |
+          python -m esptool --chip esp32s3 merge_bin \
+            -o keyboard_merged.bin \
+            --flash_mode dio \
+            --flash_freq 80m \
+            --flash_size 16MB \
+            0x0 .pio/build/esp32-s3-devkitc-1/bootloader.bin \
+            0x8000 .pio/build/esp32-s3-devkitc-1/partitions.bin \
+            0x10000 .pio/build/esp32-s3-devkitc-1/firmware.bin
+
+      - name: Upload firmware
+        uses: actions/upload-artifact@v4
+        with:
+          name: ESP32-S3-Keyboard-Firmware
+          path: keyboard_merged.bin
