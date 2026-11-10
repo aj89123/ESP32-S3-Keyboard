@@ -1,3 +1,5 @@
+
+
 #include <Arduino.h>
 #include "USB.h"
 #include "USBHIDKeyboard.h"
@@ -10,5 +12,9 @@ void setup() {
 }
 
 void loop() {
-  delay(1000);
+  delay(10000);
+  keyboard.print("ESP32 TEST");
+  while (true) {
+    delay(1000);
+  }
 }
